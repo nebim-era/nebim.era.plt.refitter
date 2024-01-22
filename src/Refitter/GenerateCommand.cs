@@ -16,9 +16,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     public override ValidationResult Validate(CommandContext context, Settings settings)
     {
-        if (!settings.NoLogging)
-            Analytics.Configure();
-
         return SettingsValidator.Validate(settings);
     }
 
@@ -82,7 +79,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
                 Directory.CreateDirectory(directory);
 
             await File.WriteAllTextAsync(outputPath, code);
-            await Analytics.LogFeatureUsage(settings);
 
             AnsiConsole.MarkupLine($"[green]Duration: {stopwatch.Elapsed}{Crlf}[/]");
 
@@ -106,7 +102,6 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
             AnsiConsole.MarkupLine("[yellow]#############################################################################[/]");
             AnsiConsole.WriteLine();
 
-            await Analytics.LogError(exception, settings);
             return exception.HResult;
         }
     }
