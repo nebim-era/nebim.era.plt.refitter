@@ -18,11 +18,11 @@ internal static class DependencyInjectionGenerator
         var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)"
             : $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)";
-        
+
         var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
             ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
             : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
-        
+
         var usings = iocSettings.UsePolly
             ? """
               using System;
@@ -44,19 +44,41 @@ internal static class DependencyInjectionGenerator
               namespace {{settings.Namespace}}
               {
                   {{usings}}
-
+                  
                   public static partial class IServiceCollectionExtensions
                   {
+                        private static RefitSettings CreateRefitSettings()
+                        {
+                            var refitSettings = new RefitSettings();
+                            var serializerOptions = new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = JsonSerde.DefaultOptions.PropertyNameCaseInsensitive,
+                                PropertyNamingPolicy = JsonSerde.DefaultOptions.PropertyNamingPolicy,
+                                NumberHandling = JsonSerde.DefaultOptions.NumberHandling,
+                                DefaultIgnoreCondition = JsonSerde.DefaultOptions.DefaultIgnoreCondition
+                            };
+                        
+                            foreach (var converter in JsonSerde.DefaultOptions.Converters)
+                            {
+                                serializerOptions.Converters.Add(converter);
+                            }
+                        
+                            serializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
+                            refitSettings.ContentSerializer = new SystemTextJsonContentSerializer(serializerOptions);
+                        
+                            return refitSettings;
+                        }
+                  
                       {{methodDeclaration}}
                       {
               """");
         foreach (var interfaceName in interfaceNames)
         {
-            var clientBuilderName = $"clientBuilder{interfaceName}"; 
+            var clientBuilderName = $"clientBuilder{interfaceName}";
             code.Append(
                 $$"""
                               var {{clientBuilderName}} = services
-                                  .AddRefitClient<{{interfaceName}}>()
+                                  .AddRefitClient<{{interfaceName}}>(CreateRefitSettings())
                                   {{configureRefitClient}}
                   """);
 
@@ -89,7 +111,7 @@ internal static class DependencyInjectionGenerator
             code.AppendLine();
             code.AppendLine();
         }
-        
+
 #pragma warning disable RS1035
         code.Remove(code.Length - Environment.NewLine.Length, Environment.NewLine.Length);
 #pragma warning restore RS1035

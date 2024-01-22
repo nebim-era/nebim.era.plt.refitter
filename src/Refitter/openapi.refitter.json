@@ -24,17 +24,19 @@
   "operationNameTemplate": "{operationName}",
   "optionalParameters": false,
   "outputFolder": "./Generated" ,
-  "outputFilename": "RefitInterface.cs",
+  "outputFilename": "RefitInterfaces.cs",
   "additionalNamespaces": [
-    "Nebim.Era.Plt.Context.AspNetExtensions"
+    "Nebim.Era.Plt.Context.AspNetExtensions",
+    "Nebim.Era.Plt.Core.Serialization.Json",
+    "System.Text.Json"
   ],
   "trimUnusedSchema": false,
   "generateDefaultAdditionalProperties": true,
   "operationNameGenerator": "SingleClientFromOperationId",
   "dependencyInjectionSettings": {
-    "ServiceName":"AccountService",
+    "ServiceName":"Test",
     "httpMessageHandlers": [
-        "EraPlatformHeaderPropagationHandler"
+      "EraPlatformHeaderPropagationHandler"
     ],
     "usePolly": true,
     "pollyMaxRetryCount": 3,
