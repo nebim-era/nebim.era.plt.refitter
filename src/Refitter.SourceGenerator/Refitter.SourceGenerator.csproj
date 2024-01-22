@@ -4,13 +4,17 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Product>Refitter Source Generator</Product>
     <PackageId>Nebim.Era.Plt.Refitter.SourceGenerator</PackageId>
-    <AssemblyName>Refitter.SourceGenerator</AssemblyName>
-    <RootNamespace>Refitter.SourceGenerator</RootNamespace>
-    <Title>Refitter.SourceGenerator</Title>
+    <AssemblyName>Nebim.Era.Plt.Refitter.SourceGenerator</AssemblyName>
+    <RootNamespace>Nebim.Era.Plt.Refitter.SourceGenerator</RootNamespace>
+    <Title>Nebim.Era.Plt.Refitter.SourceGenerator</Title>
     <Description>A C# Source Generator that uses Refitter for generating a REST API Client using the Refit library</Description>
     <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/nebim-era/nebim.era.plt.refitter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/nebim-era/nebim.era.plt.refitter</RepositoryUrl>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
