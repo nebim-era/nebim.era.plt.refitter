@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Product>Refitter Source Generator</Product>
-    <PackageId>Refitter.SourceGenerator</PackageId>
+    <PackageId>Nebim.Era.Plt.Refitter.SourceGenerator</PackageId>
     <AssemblyName>Refitter.SourceGenerator</AssemblyName>
     <RootNamespace>Refitter.SourceGenerator</RootNamespace>
     <Title>Refitter.SourceGenerator</Title>
