@@ -30,7 +30,7 @@ public class RefitGenerator(RefitGeneratorSettings settings, OpenApiDocument doc
     {
         var specialCharacters = new[]
         {
-            ":"
+            "½"
         };
         
         return specialCharacters.Aggregate(

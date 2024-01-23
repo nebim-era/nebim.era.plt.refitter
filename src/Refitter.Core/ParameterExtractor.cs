@@ -41,6 +41,16 @@ internal static class ParameterExtractor
                 return $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {variableName} {parameterValue}";
             })
             .ToList();
+        
+        var formParameters = operationModel.Parameters
+            .Where(p => p.Kind == OpenApiParameterKind.FormData && !(p.IsBinaryBodyParameter || p.IsFile) )
+            .Select(p =>
+            {
+                var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
+                var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
+                return $"[Body(BodySerializationMethod.UrlEncoded)] {GetParameterType(p, settings)} {variableName} {parameterValue}";
+            })
+            .ToList();
 
         var headerParameters = new List<string>();
 
@@ -74,6 +84,7 @@ internal static class ParameterExtractor
         parameters.AddRange(bodyParameters);
         parameters.AddRange(headerParameters);
         parameters.AddRange(binaryBodyParameters);
+        parameters.AddRange(formParameters);
 
         parameters = ReOrderNullableParameters(parameters, settings);
 
