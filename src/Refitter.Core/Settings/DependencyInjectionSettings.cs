@@ -16,6 +16,8 @@ public class DependencyInjectionSettings
     /// This can be used to identify the service that the HttpClient is interacting with.
     /// </summary>
     public string? ServiceName { get; set; }
+    
+    public string? ServiceBaseUrlSettingsKey { get; set; }
 
     /// <summary>
     /// A collection of HttpMessageHandlers to be added to the HttpClient pipeline.

@@ -15,25 +15,25 @@ internal static class DependencyInjectionGenerator
 
         var code = new StringBuilder();
 
-        var methodDeclaration = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri baseUrl, Action<IHttpClientBuilder>? builder = default)"
-            : $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Action<IHttpClientBuilder>? builder = default)";
-
-        var configureRefitClient = string.IsNullOrEmpty(iocSettings.BaseUrl)
-            ? ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)"
-            : $".ConfigureHttpClient(c => c.BaseAddress = new Uri(\"{iocSettings.BaseUrl}\"))";
+        var methodDeclaration =
+            $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri? baseUrl = null, Action<IHttpClientBuilder>? builder = default)";
+        var configureRefitClient = ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)";
 
         var usings = iocSettings.UsePolly
             ? """
-              using System;
+                  using System;
+                  using Core.PlatformConfigs;
                   using Microsoft.Extensions.DependencyInjection;
+                  using Microsoft.Extensions.Options;
                   using Polly;
                   using Polly.Contrib.WaitAndRetry;
                   using Polly.Extensions.Http;
               """
             : """
-              using System;
+                  using System;
+                  using Core.PlatformConfigs;
                   using Microsoft.Extensions.DependencyInjection;
+                  using Microsoft.Extensions.Options;
               """;
 
         code.AppendLine();
@@ -71,6 +71,14 @@ internal static class DependencyInjectionGenerator
                   
                       {{methodDeclaration}}
                       {
+                      
+                      var platformSvcSettings =
+                         services.BuildServiceProvider().GetRequiredService<IOptions<PlatformServicesSettings>>();
+              
+                      if (baseUrl is null && string.IsNullOrWhiteSpace(platformSvcSettings.Value.{{iocSettings.ServiceBaseUrlSettingsKey}}))
+                          throw new InvalidOperationException("{{iocSettings.ServiceName}} address is not configured.");
+                      
+                      baseUrl ??= new Uri(platformSvcSettings.Value.AccountServiceAddress!);
               """");
         foreach (var interfaceName in interfaceNames)
         {

@@ -35,6 +35,7 @@
   "operationNameGenerator": "SingleClientFromOperationId",
   "dependencyInjectionSettings": {
     "ServiceName":"Test",
+    "ServiceBaseUrlSettingsKey" : "",
     "httpMessageHandlers": [
       "EraPlatformHeaderPropagationHandler"
     ],
