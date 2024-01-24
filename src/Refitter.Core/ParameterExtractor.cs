@@ -48,7 +48,7 @@ internal static class ParameterExtractor
             {
                 var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-                return $"[Body(BodySerializationMethod.UrlEncoded)] {GetParameterType(p, settings)} {variableName} {parameterValue}";
+                return $"{GetParameterType(p, settings)} {variableName} {parameterValue}";
             })
             .ToList();
 
