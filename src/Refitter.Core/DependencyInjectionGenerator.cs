@@ -78,7 +78,7 @@ internal static class DependencyInjectionGenerator
                       if (baseUrl is null && string.IsNullOrWhiteSpace(platformSvcSettings.Value.{{iocSettings.ServiceBaseUrlSettingsKey}}))
                           throw new InvalidOperationException("{{iocSettings.ServiceName}} address is not configured.");
                       
-                      baseUrl ??= new Uri(platformSvcSettings.Value.AccountServiceAddress!);
+                      baseUrl ??= new Uri(platformSvcSettings.Value.{{iocSettings.ServiceBaseUrlSettingsKey}}!);
               """");
         foreach (var interfaceName in interfaceNames)
         {
