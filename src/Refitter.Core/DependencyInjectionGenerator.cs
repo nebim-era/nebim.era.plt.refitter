@@ -16,7 +16,7 @@ internal static class DependencyInjectionGenerator
         var code = new StringBuilder();
 
         var methodDeclaration =
-            $"public static IServiceCollection Add{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri? baseUrl = null, Action<IHttpClientBuilder>? builder = default)";
+            $"public static IServiceCollection AddEra{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri? baseUrl = null, Action<IHttpClientBuilder>? builder = default)";
         var configureRefitClient = ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)";
 
         var usings = iocSettings.UsePolly
