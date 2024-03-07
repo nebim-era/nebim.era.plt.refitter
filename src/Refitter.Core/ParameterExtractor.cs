@@ -15,9 +15,8 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Path)
             .Select(p =>
             {
-                var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-                return $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {variableName} {parameterValue}";
+                return $"{JoinAttributes(GetAliasAsAttribute(p))}{p.Type} {variableName}";
             })
             .ToList();
 
@@ -25,9 +24,8 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Query)
             .Select(p =>
             {
-                var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-               return $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {variableName} {parameterValue}";
+               return $"{JoinAttributes(GetQueryAttribute(p, settings), GetAliasAsAttribute(p))}{GetQueryParameterType(p, settings)} {variableName}";
             })
                 
             .ToList();
@@ -36,9 +34,8 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.Body && !p.IsBinaryBodyParameter)
             .Select(p =>
             {
-                var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-                return $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {variableName} {parameterValue}";
+                return $"{JoinAttributes("Body", GetAliasAsAttribute(p))}{GetParameterType(p, settings)} {variableName}";
             })
             .ToList();
         
@@ -46,9 +43,8 @@ internal static class ParameterExtractor
             .Where(p => p.Kind == OpenApiParameterKind.FormData && !(p.IsBinaryBodyParameter || p.IsFile) )
             .Select(p =>
             {
-                var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-                return $"{GetParameterType(p, settings)} {variableName} {parameterValue}";
+                return $"{GetParameterType(p, settings)} {variableName}";
             })
             .ToList();
 
@@ -58,11 +54,7 @@ internal static class ParameterExtractor
         {
             headerParameters = operationModel.Parameters
                 .Where(p => p.Kind == OpenApiParameterKind.Header && p.IsHeader)
-                .Select(p =>
-                {
-                    var parameterValue = p.Type.EndsWith("?") || p.Type == "string" ? "= null" : "";
-                    return $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName} {parameterValue}";
-                })
+                .Select(p => $"{JoinAttributes($"Header(\"{p.Name}\")")}{GetParameterType(p, settings)} {p.VariableName}")
                 .ToList();
         }
 
