@@ -136,10 +136,10 @@ internal static class ParameterExtractor
             .TrimImportedNamespaces(
                 FindSupportedType(
                     parameterModel.Type));
-
+        
         if (settings.OptionalParameters &&
-            !type.EndsWith("?") &&
-            (parameterModel.IsNullable || parameterModel.IsOptional || !parameterModel.IsRequired))
+            !type.EndsWith("?") && !parameterModel.IsRequired &&
+            (parameterModel.IsNullable || (parameterModel.IsOptional && !parameterModel.IsObject)))
             type += "?";
 
         return type;
