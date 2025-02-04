@@ -17,7 +17,35 @@ internal static class DependencyInjectionGenerator
 
         var methodDeclaration =
             $"public static IServiceCollection AddEra{iocSettings.ServiceName}Clients(this IServiceCollection services, Uri? baseUrl = null, Action<IHttpClientBuilder>? builder = default)";
-        var configureRefitClient = ".ConfigureHttpClient(c => c.BaseAddress = baseUrl)";
+        var configureHttpClient = """
+                                  .ConfigureHttpClient(c =>
+                                                  {
+                                                      c.BaseAddress = baseUrl;
+                                                      c.DefaultRequestVersion = HttpVersion.Version20;
+                                                      c.DefaultRequestHeaders.AcceptEncoding.Add(new System.Net.Http.Headers.StringWithQualityHeaderValue("br"));
+                                                      c.DefaultRequestHeaders.ConnectionClose = false;
+                                                      c.DefaultRequestHeaders.Add("Keep-Alive", "timeout=300, max=500");
+                                                      c.Timeout = TimeSpan.FromSeconds(30);
+                                                  })
+                                  """;
+        
+        var configurePrimaryMessageHandler = """
+                                             .ConfigurePrimaryHttpMessageHandler(() =>
+                                             {
+                                                 return new SocketsHttpHandler
+                                                 {
+                                                     PooledConnectionLifetime = TimeSpan.FromMinutes(5), // Bağlantılar 5 dakikada bir yenilenir
+                                                     EnableMultipleHttp2Connections = true, // Paralel istekler için birden fazla HTTP/2 bağlantısına izin ver
+                                                     AutomaticDecompression = DecompressionMethods.All,
+                                                     PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2), // 2 dakika kullanılmayan bağlantıları kapat
+                                             
+                                                     // 8. Keep-alive ayarları
+                                                     KeepAlivePingTimeout = TimeSpan.FromSeconds(15), // 15 saniye içinde yanıt gelmezse bağlantıyı kes
+                                                     KeepAlivePingDelay = TimeSpan.FromSeconds(60),  // 60 saniyede bir ping gönder
+                                                     KeepAlivePingPolicy = HttpKeepAlivePingPolicy.Always // Her durumda ping yap
+                                                 };
+                                             })
+                                             """;
 
         var usings = iocSettings.UsePolly
             ? """
@@ -47,8 +75,15 @@ internal static class DependencyInjectionGenerator
                   
                   public static partial class IServiceCollectionExtensions
                   {
+                        private static RefitSettings _refitSettings;
+                  
                         private static RefitSettings CreateRefitSettings()
                         {
+                           if (_refitSettings != null)
+                           {
+                               return _refitSettings;
+                           }
+                           
                             var refitSettings = new RefitSettings();
                             var serializerOptions = new JsonSerializerOptions
                             {
@@ -66,7 +101,8 @@ internal static class DependencyInjectionGenerator
                             serializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
                             refitSettings.ContentSerializer = new SystemTextJsonContentSerializer(serializerOptions);
                         
-                            return refitSettings;
+                            _refitSettings = refitSettings;
+                            return _refitSettings;
                         }
                   
                       {{methodDeclaration}}
@@ -87,7 +123,8 @@ internal static class DependencyInjectionGenerator
                 $$"""
                               var {{clientBuilderName}} = services
                                   .AddRefitClient<{{interfaceName}}>(CreateRefitSettings())
-                                  {{configureRefitClient}}
+                                  {{configureHttpClient}}
+                                  {{configurePrimaryMessageHandler}}
                   """);
 
             foreach (string httpMessageHandler in iocSettings.HttpMessageHandlers)
