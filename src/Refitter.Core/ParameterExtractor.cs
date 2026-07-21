@@ -66,7 +66,7 @@ internal static class ParameterExtractor
                     ? string.Empty
                     : $"[{GetAliasAsAttribute(p)}]";
                 var variableName = p.Type.EndsWith("Request") ? "request" : p.VariableName;
-                return $"{generatedAliasAsAttribute} StreamPart {variableName}";
+                return $"{generatedAliasAsAttribute} {GetBinaryParameterType(p, settings)} {variableName}";
             })
             .ToList();
 
@@ -156,6 +156,26 @@ internal static class ParameterExtractor
             type = "string";
 
         return type;
+    }
+
+    private static string GetBinaryParameterType(
+        CSharpParameterModel parameterModel,
+        RefitGeneratorSettings settings)
+    {
+        if (!parameterModel.IsArray)
+            return "StreamPart";
+
+        var configuredArrayType = settings.CodeGeneratorSettings?.ArrayType;
+        if (!string.IsNullOrWhiteSpace(configuredArrayType))
+        {
+            var arrayType = WellKnownNamesspaces.TrimImportedNamespaces(
+                configuredArrayType!);
+            return $"{arrayType}<StreamPart>";
+        }
+
+        return GetParameterType(parameterModel, settings)
+            .Replace("FileParameter", "StreamPart")
+            .Replace("FileResponse", "StreamPart");
     }
 
     private static string FindSupportedType(string typeName) =>

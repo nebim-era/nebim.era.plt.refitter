@@ -38,6 +38,21 @@ public class MultiPartFormDataTests
                            ""formFile"":{
                               ""type"":""string"",
                               ""format"":""binary""
+                           },
+                           ""Files"":{
+                              ""type"":""array"",
+                              ""items"":{
+                                 ""type"":""string"",
+                                 ""format"":""binary""
+                              }
+                           },
+                           ""nullableFiles"":{
+                              ""type"":""array"",
+                              ""items"":{
+                                 ""type"":""string"",
+                                 ""format"":""binary"",
+                                 ""nullable"":true
+                              }
                            }
                         }
                      },
@@ -91,10 +106,38 @@ public class MultiPartFormDataTests
         generateCode.Should().Contain("StreamPart");
     }
 
-    private static async Task<string> GenerateCode()
+    [Fact]
+    public async Task Generated_Code_Contains_StreamPart_Collection_For_Binary_Array()
+    {
+        string generateCode = await GenerateCode(
+            new CodeGeneratorSettings
+            {
+                ArrayType = "System.Collections.Generic.List"
+            });
+
+        generateCode.Should().Contain("[AliasAs(\"Files\")] List<StreamPart> files");
+    }
+
+    [Fact]
+    public async Task Nullable_Binary_Array_Items_Do_Not_Collapse_Collection()
+    {
+        string generateCode = await GenerateCode(
+            new CodeGeneratorSettings
+            {
+                ArrayType = "System.Collections.Generic.List"
+            });
+
+        generateCode.Should().Contain("List<StreamPart> nullableFiles");
+    }
+
+    private static async Task<string> GenerateCode(CodeGeneratorSettings? codeGeneratorSettings = null)
     {
         var swaggerFile = await CreateSwaggerFile(OpenApiSpec);
-        var settings = new RefitGeneratorSettings { OpenApiPath = swaggerFile };
+        var settings = new RefitGeneratorSettings
+        {
+            OpenApiPath = swaggerFile,
+            CodeGeneratorSettings = codeGeneratorSettings
+        };
 
         var sut = await RefitGenerator.CreateAsync(settings);
         var generateCode = sut.Generate();
