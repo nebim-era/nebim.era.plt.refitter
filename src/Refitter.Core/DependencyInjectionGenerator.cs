@@ -122,7 +122,7 @@ internal static class DependencyInjectionGenerator
             code.Append(
                 $$"""
                               var {{clientBuilderName}} = services
-                                  .AddRefitClient<{{interfaceName}}>(CreateRefitSettings())
+                                  .AddRefitGeneratedClient<{{interfaceName}}>(CreateRefitSettings())
                                   {{configureHttpClient}}
                                   {{configurePrimaryMessageHandler}}
                   """);

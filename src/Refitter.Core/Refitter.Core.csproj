@@ -11,10 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.2.0" />
-    <PackageReference Include="NSwag.Core.Yaml" Version="14.2.0" />
-    <PackageReference Include="OasReader" Version="1.6.11.14" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.100" PrivateAssets="All" />
+    <PackageReference Include="NSwag.CodeGeneration.CSharp" Version="14.8.0" />
+    <PackageReference Include="NSwag.Core.Yaml" Version="14.8.0" />
+    <PackageReference Include="OasReader" Version="3.10.2.21" />
   </ItemGroup>
 
   <ItemGroup>

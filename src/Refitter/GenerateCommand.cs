@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 using Refitter.Core;
 using Refitter.Validation;
@@ -19,7 +19,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
         return SettingsValidator.Validate(settings);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
     {
         var refitGeneratorSettings = new RefitGeneratorSettings
         {
@@ -136,7 +136,7 @@ public sealed class GenerateCommand : AsyncCommand<Settings>
 
     private static async Task ValidateOpenApiSpec(string openApiPath)
     {
-        var validationResult = await OpenApiValidator.Validate(openApiPath);
+        var validationResult = await Validation.OpenApiValidator.Validate(openApiPath);
         if (!validationResult.IsValid)
         {
             AnsiConsole.MarkupLine($"[red]{Crlf}OpenAPI validation failed:{Crlf}[/]");
