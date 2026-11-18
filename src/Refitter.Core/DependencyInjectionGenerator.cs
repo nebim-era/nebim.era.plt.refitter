@@ -98,7 +98,6 @@ internal static class DependencyInjectionGenerator
                                 serializerOptions.Converters.Add(converter);
                             }
                         
-                            serializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
                             refitSettings.ContentSerializer = new SystemTextJsonContentSerializer(serializerOptions);
                         
                             _refitSettings = refitSettings;
