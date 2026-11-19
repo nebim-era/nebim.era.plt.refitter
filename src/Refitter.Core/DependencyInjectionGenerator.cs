@@ -107,6 +107,7 @@ internal static class DependencyInjectionGenerator
                       {{methodDeclaration}}
                       {
                       
+                      ReflectionSupport.EnsureRegistered();
                       var platformSvcSettings =
                          services.BuildServiceProvider().GetRequiredService<IOptions<PlatformServicesSettings>>();
               
